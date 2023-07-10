@@ -83,10 +83,10 @@ fi
 echo "building timestampvm"
 
 # delete previous (if exists)
-rm -f /tmp/avalanchego-${avalanche_version}/plugins/tGas3T58KzdjLHhBDMnH2TvrddhqTji5iZAMZ3RXs2NLpSnhH
+rm -f /tmp/avalanchego-${avalanche_version}/plugins/vuF4cW6EQEknhDU36Q976iZoNWNkkbDEM87jasYF5JrCdUJan
 
 go build \
-  -o /tmp/avalanchego-${avalanche_version}/plugins/tGas3T58KzdjLHhBDMnH2TvrddhqTji5iZAMZ3RXs2NLpSnhH \
+  -o /tmp/avalanchego-${avalanche_version}/plugins/vuF4cW6EQEknhDU36Q976iZoNWNkkbDEM87jasYF5JrCdUJan \
   ./main/
 find /tmp/avalanchego-${avalanche_version}
 
@@ -172,13 +172,13 @@ if [[ ${MODE} == "test" ]]; then
   echo "network-runner RPC server was running on PID ${PID} as test mode; terminating the process..."
   pkill -P ${PID} || true
   kill -2 ${PID} || true
-  pkill -9 -f tGas3T58KzdjLHhBDMnH2TvrddhqTji5iZAMZ3RXs2NLpSnhH || true # in case pkill didn't work
+  pkill -9 -f vuF4cW6EQEknhDU36Q976iZoNWNkkbDEM87jasYF5JrCdUJan || true # in case pkill didn't work
   exit ${STATUS}
 else
   echo "network-runner RPC server is running on PID ${PID}..."
   echo ""
   echo "use the following command to terminate:"
   echo ""
-  echo "pkill -P ${PID} && kill -2 ${PID} && pkill -9 -f tGas3T58KzdjLHhBDMnH2TvrddhqTji5iZAMZ3RXs2NLpSnhH"
+  echo "pkill -P ${PID} && kill -2 ${PID} && pkill -9 -f vuF4cW6EQEknhDU36Q976iZoNWNkkbDEM87jasYF5JrCdUJan"
   echo ""
 fi

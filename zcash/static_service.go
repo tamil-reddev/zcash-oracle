@@ -1,14 +1,14 @@
 // Copyright (C) 2019-2023, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
-package timestampvm
+package zcash
 
 import (
 	"errors"
-	"fmt"
-	"net/http"
+	// "fmt"
+	// "net/http"
 
-	"github.com/ava-labs/avalanchego/utils/formatting"
+	// "github.com/ava-labs/avalanchego/utils/formatting"
 )
 
 var errArgumentDataEmpty = errors.New("argument Data cannot be empty")
@@ -20,7 +20,7 @@ type StaticService struct{}
 func CreateStaticService() *StaticService {
 	return &StaticService{}
 }
-
+/*
 // EncodeArgs are arguments for Encode
 type EncodeArgs struct {
 	Data     string              `json:"data"`
@@ -78,3 +78,4 @@ func (*StaticService) Decode(_ *http.Request, args *DecodeArgs, reply *DecodeRep
 	reply.Encoding = args.Encoding
 	return nil
 }
+*/

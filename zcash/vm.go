@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2023, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
-package timestampvm
+package zcash
 
 import (
 	"context"
@@ -27,7 +27,7 @@ import (
 
 const (
 	DataLen        = 32
-	Name           = "timestampvm"
+	Name           = "zcash"
 	MaxMempoolSize = 4096
 )
 
@@ -61,7 +61,7 @@ type VM struct {
 	toEngine chan<- common.Message
 
 	// Proposed pieces of data that haven't been put into a block and proposed yet
-	mempool [][DataLen]byte
+	mempool [][]byte
 
 	// Block ID --> Block
 	// Each element is a block that passed verification but
@@ -143,7 +143,7 @@ func (vm *VM) initGenesis(genesisData []byte) error {
 
 	// genesisData is a byte slice but each block contains an byte array
 	// Take the first [DataLen] bytes from genesisData and put them in an array
-	genesisDataArr := BytesToData(genesisData)
+	genesisDataArr := genesisData
 	log.Debug("genesis", "data", genesisDataArr)
 
 	// Create the genesis block
@@ -218,6 +218,7 @@ func (*VM) HealthCheck(_ context.Context) (interface{}, error) { return nil, nil
 
 // BuildBlock returns a block that this vm wants to add to consensus
 func (vm *VM) BuildBlock(ctx context.Context) (snowman.Block, error) {
+	fmt.Printf("BuildBlock : \n")
 	if len(vm.mempool) == 0 { // There is no block to be built
 		return nil, errNoPendingBlocks
 	}
@@ -283,11 +284,18 @@ func (vm *VM) LastAccepted(_ context.Context) (ids.ID, error) { return vm.state.
 // Then it notifies the consensus engine
 // that a new block is ready to be added to consensus
 // (namely, a block with data [data])
-func (vm *VM) proposeBlock(data [DataLen]byte) bool {
+/*func (vm *VM) proposeBlock(data [DataLen]byte) bool {
 	if len(vm.mempool) > MaxMempoolSize {
 		return false
 	}
 	vm.mempool = append(vm.mempool, data)
+	vm.NotifyBlockReady()
+	return true
+}*/
+
+
+func (vm *VM) addZcashBlock(block []byte) bool {
+	vm.mempool = append(vm.mempool, block)
 	vm.NotifyBlockReady()
 	return true
 }
@@ -297,6 +305,7 @@ func (vm *VM) proposeBlock(data [DataLen]byte) bool {
 // and by the consensus layer when it receives the byte representation of a block
 // from another node
 func (vm *VM) ParseBlock(_ context.Context, bytes []byte) (snowman.Block, error) {
+	fmt.Printf("Parse Block :\n")
 	// A new empty block
 	block := &Block{}
 
@@ -305,7 +314,7 @@ func (vm *VM) ParseBlock(_ context.Context, bytes []byte) (snowman.Block, error)
 	if err != nil {
 		return nil, err
 	}
-
+	
 	// Initialize the block
 	block.Initialize(bytes, choices.Processing, vm)
 
@@ -323,7 +332,8 @@ func (vm *VM) ParseBlock(_ context.Context, bytes []byte) (snowman.Block, error)
 // - the block's parent is [parentID]
 // - the block's data is [data]
 // - the block's timestamp is [timestamp]
-func (vm *VM) NewBlock(parentID ids.ID, height uint64, data [DataLen]byte, timestamp time.Time) (*Block, error) {
+func (vm *VM) NewBlock(parentID ids.ID, height uint64, data []byte, timestamp time.Time) (*Block, error) {
+	fmt.Printf("NewBlock : \n")
 	block := &Block{
 		PrntID: parentID,
 		Hght:   height,
@@ -431,4 +441,12 @@ func (*VM) CrossChainAppRequestFailed(_ context.Context, _ ids.ID, _ uint32) err
 
 func (*VM) CrossChainAppResponse(_ context.Context, _ ids.ID, _ uint32, _ []byte) error {
 	return nil
+}
+
+func (vm *VM) queryData(ID uint64) (ZcashBlock, error) {
+    return vm.state.QueryData(ID)
+}
+
+func (vm *VM) getBlockByHeight(ID uint64) (ZcashBlock) {
+    return vm.state.GetBlockByHeight(ID)
 }

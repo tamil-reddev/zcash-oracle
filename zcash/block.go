@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2023, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
-package timestampvm
+package zcash
 
 import (
 	"context"
@@ -13,12 +13,14 @@ import (
 	"github.com/ava-labs/avalanchego/snow/choices"
 	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
 	"github.com/ava-labs/avalanchego/utils/hashing"
+	"encoding/json"
 )
 
 var (
 	errTimestampTooEarly = errors.New("block's timestamp is earlier than its parent's timestamp")
 	errDatabaseGet       = errors.New("error while retrieving data from database")
 	errTimestampTooLate  = errors.New("block's timestamp is more than 1 hour ahead of local time")
+	errBlockNotMatch     = errors.New("The zcash block queried is not match")
 
 	_ snowman.Block = &Block{}
 )
@@ -33,7 +35,7 @@ type Block struct {
 	PrntID ids.ID        `serialize:"true" json:"parentID"`  // parent's ID
 	Hght   uint64        `serialize:"true" json:"height"`    // This block's height. The genesis block is at height 0.
 	Tmstmp int64         `serialize:"true" json:"timestamp"` // Time this block was proposed at
-	Dt     [DataLen]byte `serialize:"true" json:"data"`      // Arbitrary data
+	Dt     []byte    `serialize:"true" json:"data"`      // Arbitrary data
 
 	id     ids.ID         // hold this block's ID
 	bytes  []byte         // this block's encoded bytes
@@ -45,6 +47,7 @@ type Block struct {
 // To be valid, it must be that:
 // b.parent.Timestamp < b.Timestamp <= [local time] + 1 hour
 func (b *Block) Verify(_ context.Context) error {
+	fmt.Printf("Verify block with zcash \n")
 	// Get [b]'s parent
 	parentID := b.Parent()
 	parent, err := b.vm.getBlock(parentID)
@@ -72,6 +75,21 @@ func (b *Block) Verify(_ context.Context) error {
 		return errTimestampTooLate
 	}
 
+	zblock := ZcashBlock{}
+	err = json.Unmarshal(b.Dt, &zblock)
+	block, err := b.vm.queryData(uint64(zblock.Height))
+	
+	fmt.Printf("current zblock.Hash : %+v\n",zblock.Hash)
+    fmt.Printf("actual  zblock.Hash : %+v\n",zblock.Hash)
+	if err != nil {
+		return errBlockNotMatch
+	}
+
+	if zblock.Hash != "" && zblock.Hash != block.Hash {
+		return errBlockNotMatch
+	}
+	
+
 	// Put that block to verified blocks in memory
 	b.vm.verifiedBlocks[b.ID()] = b
 
@@ -81,6 +99,7 @@ func (b *Block) Verify(_ context.Context) error {
 // Initialize sets [b.bytes] to [bytes], [b.id] to hash([b.bytes]),
 // [b.status] to [status] and [b.vm] to [vm]
 func (b *Block) Initialize(bytes []byte, status choices.Status, vm *VM) {
+	fmt.Printf("Initialize block with zcash : \n")
 	b.bytes = bytes
 	b.id = hashing.ComputeHash256Array(b.bytes)
 	b.status = status
@@ -90,6 +109,7 @@ func (b *Block) Initialize(bytes []byte, status choices.Status, vm *VM) {
 // Accept sets this block's status to Accepted and sets lastAccepted to this
 // block's ID and saves this info to b.vm.DB
 func (b *Block) Accept(_ context.Context) error {
+	fmt.Printf("Accept block with zcash: \n")
 	b.SetStatus(choices.Accepted) // Change state of this block
 	blkID := b.ID()
 
@@ -113,6 +133,7 @@ func (b *Block) Accept(_ context.Context) error {
 // Reject sets this block's status to Rejected and saves the status in state
 // Recall that b.vm.DB.Commit() must be called to persist to the DB
 func (b *Block) Reject(_ context.Context) error {
+	fmt.Printf("Reject block with zcash")
 	b.SetStatus(choices.Rejected) // Change state of this block
 	if err := b.vm.state.PutBlock(b); err != nil {
 		return err
@@ -142,7 +163,7 @@ func (b *Block) Status() choices.Status { return b.status }
 func (b *Block) Bytes() []byte { return b.bytes }
 
 // Data returns the data of this block
-func (b *Block) Data() [DataLen]byte { return b.Dt }
+func (b *Block) Data() []byte { return b.Dt }
 
 // SetStatus sets the status of this block
 func (b *Block) SetStatus(status choices.Status) { b.status = status }

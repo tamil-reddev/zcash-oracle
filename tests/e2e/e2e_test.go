@@ -15,7 +15,6 @@ import (
 	runner_sdk "github.com/ava-labs/avalanche-network-runner/client"
 	"github.com/ava-labs/avalanche-network-runner/rpcpb"
 	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/hashing"
 	"github.com/ava-labs/avalanchego/utils/logging"
 	"github.com/ava-labs/timestampvm/client"
 	"github.com/ava-labs/timestampvm/timestampvm"
@@ -119,7 +118,7 @@ func init() {
 	)
 }
 
-const vmName = "timestamp"
+const vmName = "zcash"
 
 var vmID ids.ID
 
@@ -309,14 +308,13 @@ var _ = ginkgo.AfterSuite(func() {
 })
 
 var _ = ginkgo.Describe("[ProposeBlock]", func() {
-	var gid ids.ID
 	ginkgo.It("get genesis block", func() {
 		for _, inst := range instances {
 			cli := inst.cli
 			timestamp, data, height, id, _, err := cli.GetBlock(context.Background(), nil)
-			gid = id
+			log.Warn("client shutdown result", "err", id)
 			gomega.Ω(timestamp).Should(gomega.Equal(uint64(0)))
-			gomega.Ω(data).Should(gomega.Equal(timestampvm.BytesToData([]byte("e2e"))))
+			gomega.Ω(data).Should(gomega.Equal(timestampvm.ZcashBlock{}))
 			gomega.Ω(height).Should(gomega.Equal(uint64(0)))
 			gomega.Ω(err).Should(gomega.BeNil())
 		}
@@ -328,35 +326,35 @@ var _ = ginkgo.Describe("[ProposeBlock]", func() {
 		return
 	}
 
-	data := timestampvm.BytesToData(hashing.ComputeHash256([]byte("test")))
-	now := time.Now().Unix()
-	ginkgo.It("create new block", func() {
-		cli := instances[0].cli
-		success, err := cli.ProposeBlock(context.Background(), data)
-		gomega.Ω(success).Should(gomega.BeTrue())
-		gomega.Ω(err).Should(gomega.BeNil())
-	})
+	//data := timestampvm.BytesToData(hashing.ComputeHash256([]byte("test")))
+	//now := time.Now().Unix()
+	// ginkgo.It("create new block", func() {
+	// 	cli := instances[0].cli
+	// 	success, err := cli.ProposeBlock(context.Background(), data)
+	// 	gomega.Ω(success).Should(gomega.BeTrue())
+	// 	gomega.Ω(err).Should(gomega.BeNil())
+	// })
 
-	ginkgo.It("confirm block processed on all nodes", func() {
-		for i, inst := range instances {
-			cli := inst.cli
-			for { // Wait for block to be accepted
-				timestamp, bdata, height, _, pid, err := cli.GetBlock(context.Background(), nil)
-				if height == 0 {
-					log.Info("waiting for height to increase", "instance", i)
-					time.Sleep(1 * time.Second)
-					continue
-				}
-				gomega.Ω(uint64(now)-5 < timestamp).Should(gomega.BeTrue())
-				gomega.Ω(bdata).Should(gomega.Equal(data))
-				gomega.Ω(height).Should(gomega.Equal(uint64(1)))
-				gomega.Ω(pid).Should(gomega.Equal(gid))
-				gomega.Ω(err).Should(gomega.BeNil())
-				log.Info("height increased", "instance", i)
-				break
-			}
-		}
-	})
+	// ginkgo.It("confirm block processed on all nodes", func() {
+	// 	for i, inst := range instances {
+	// 		cli := inst.cli
+	// 		for { // Wait for block to be accepted
+	// 			timestamp, bdata, height, _, pid, err := cli.GetBlock(context.Background(), nil)
+	// 			if height == 0 {
+	// 				log.Info("waiting for height to increase", "instance", i)
+	// 				time.Sleep(1 * time.Second)
+	// 				continue
+	// 			}
+	// 			gomega.Ω(uint64(now)-5 < timestamp).Should(gomega.BeTrue())
+	// 			gomega.Ω(bdata).Should(gomega.Equal(data))
+	// 			gomega.Ω(height).Should(gomega.Equal(uint64(1)))
+	// 			gomega.Ω(pid).Should(gomega.Equal(gid))
+	// 			gomega.Ω(err).Should(gomega.BeNil())
+	// 			log.Info("height increased", "instance", i)
+	// 			break
+	// 		}
+	// 	}
+	// })
 })
 
 // Outputs to stdout.

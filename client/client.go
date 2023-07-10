@@ -7,19 +7,17 @@ import (
 	"context"
 
 	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/formatting"
 	"github.com/ava-labs/avalanchego/utils/rpc"
-
-	"github.com/ava-labs/timestampvm/timestampvm"
+	"https://github.com/tamil-reddev/zcash-oracle/zcash"
 )
 
 // Client defines timestampvm client operations.
 type Client interface {
-	// ProposeBlock submits data for a block
-	ProposeBlock(ctx context.Context, data [timestampvm.DataLen]byte) (bool, error)
-
 	// GetBlock fetches the contents of a block
-	GetBlock(ctx context.Context, blockID *ids.ID) (uint64, [timestampvm.DataLen]byte, uint64, ids.ID, ids.ID, error)
+	GetBlock(ctx context.Context, blockID *ids.ID) (uint64, timestampvm.ZcashBlock, uint64, ids.ID, ids.ID, error)
+
+	GetBlockByHeight(ctx context.Context, blockID uint64) (string, uint64, uint64, uint64, error)
+
 }
 
 // New creates a new client object.
@@ -32,37 +30,31 @@ type client struct {
 	req rpc.EndpointRequester
 }
 
-func (cli *client) ProposeBlock(ctx context.Context, data [timestampvm.DataLen]byte) (bool, error) {
-	bytes, err := formatting.Encode(formatting.Hex, data[:])
-	if err != nil {
-		return false, err
-	}
 
-	resp := new(timestampvm.ProposeBlockReply)
-	err = cli.req.SendRequest(ctx,
-		"timestampvm.proposeBlock",
-		&timestampvm.ProposeBlockArgs{Data: bytes},
-		resp,
-	)
-	if err != nil {
-		return false, err
-	}
-	return resp.Success, nil
-}
-
-func (cli *client) GetBlock(ctx context.Context, blockID *ids.ID) (uint64, [timestampvm.DataLen]byte, uint64, ids.ID, ids.ID, error) {
+func (cli *client) GetBlock(ctx context.Context, blockID *ids.ID) (uint64, timestampvm.ZcashBlock, uint64, ids.ID, ids.ID, error) {
 	resp := new(timestampvm.GetBlockReply)
 	err := cli.req.SendRequest(ctx,
-		"timestampvm.getBlock",
+		"zcash.getBlock",
 		&timestampvm.GetBlockArgs{ID: blockID},
 		resp,
 	)
+
 	if err != nil {
-		return 0, [timestampvm.DataLen]byte{}, 0, ids.Empty, ids.Empty, err
+		
 	}
-	bytes, err := formatting.Decode(formatting.Hex, resp.Data)
+	return uint64(resp.Timestamp), resp.Data, uint64(resp.Height), resp.ID, resp.ParentID, nil
+}
+
+func (cli *client) GetBlockByHeight(ctx context.Context, id uint64) (string, uint64, uint64,  uint64, error) {
+	resp := new(timestampvm.QueryZcashBlockReply)
+	err := cli.req.SendRequest(ctx,
+		"zcash.getBlockByHeight",
+		&timestampvm.QueryDataArgs{ID: id},
+		resp,
+	)
 	if err != nil {
-		return 0, [timestampvm.DataLen]byte{}, 0, ids.Empty, ids.Empty, err
+		return  "", 0, 0, 0, err
 	}
-	return uint64(resp.Timestamp), timestampvm.BytesToData(bytes), uint64(resp.Height), resp.ID, resp.ParentID, nil
+
+	return resp.Hash, uint64(resp.Confirmations), uint64(resp.Size),  uint64(resp.Height), nil
 }
