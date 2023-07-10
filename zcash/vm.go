@@ -93,10 +93,10 @@ func (vm *VM) Initialize(
 ) error {
 	version, err := vm.Version(ctx)
 	if err != nil {
-		log.Error("error initializing Timestamp VM: %v", err)
+		log.Error("error initializing Zcash VM: %v", err)
 		return err
 	}
-	log.Info("Initializing Timestamp VM", "Version", version)
+	log.Info("Initializing Zcash VM", "Version", version)
 
 	vm.dbManager = dbManager
 	vm.snowCtx = snowCtx
@@ -147,7 +147,7 @@ func (vm *VM) initGenesis(genesisData []byte) error {
 	log.Debug("genesis", "data", genesisDataArr)
 
 	// Create the genesis block
-	// Timestamp of genesis block is 0. It has no parent.
+	// Zcash of genesis block is 0. It has no parent.
 	genesisBlock, err := vm.NewBlock(ids.Empty, 0, genesisDataArr, time.Unix(0, 0))
 	if err != nil {
 		log.Error("error while creating genesis block: %v", err)

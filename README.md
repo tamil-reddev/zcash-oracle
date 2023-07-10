@@ -1,4 +1,4 @@
-# Timestamp Virtual Machine
+# Zcash Virtual Machine
 
 [![Lint+Test+Build](https://github.com/tamil-reddev/zcash-oracle/actions/workflows/lint_test_build.yml/badge.svg)](https://github.com/tamil-reddev/zcash-oracle/actions/workflows/lint_test_build.yml)
 
