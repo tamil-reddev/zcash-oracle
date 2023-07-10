@@ -23,14 +23,14 @@ if ! [[ "$0" =~ scripts/run.sh ]]; then
   exit 255
 fi
 
-# TimestampVM root directory
-TIMESTAMPVM_PATH=$(
+# zcash root directory
+ZCASH_PATH=$(
   cd "$(dirname "${BASH_SOURCE[0]}")"
   cd .. && pwd
 )
 
 # Load the versions
-source "$TIMESTAMPVM_PATH"/scripts/versions.sh
+source "$ZCASH_PATH"/scripts/versions.sh
 
 MODE=${MODE:-run}
 E2E=${E2E:-false}
@@ -80,7 +80,7 @@ fi
 ############################
 
 ############################
-echo "building timestampvm"
+echo "building zcash"
 
 # delete previous (if exists)
 rm -f /tmp/avalanchego-${avalanche_version}/plugins/vuF4cW6EQEknhDU36Q976iZoNWNkkbDEM87jasYF5JrCdUJan

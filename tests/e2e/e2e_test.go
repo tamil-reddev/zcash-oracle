@@ -16,8 +16,8 @@ import (
 	"github.com/ava-labs/avalanche-network-runner/rpcpb"
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/timestampvm/client"
-	"github.com/ava-labs/timestampvm/timestampvm"
+	"github.com/tamil-reddev/zcash-oracle/client"
+	"github.com/tamil-reddev/zcash-oracle/zcash"
 	log "github.com/inconshreveable/log15"
 	ginkgo "github.com/onsi/ginkgo/v2"
 	"github.com/onsi/ginkgo/v2/formatter"
@@ -27,7 +27,7 @@ import (
 
 func TestE2e(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "timestampvm e2e test suites")
+	ginkgo.RunSpecs(t, "zcash e2e test suites")
 }
 
 var (
@@ -140,7 +140,7 @@ const (
 
 var (
 	cli               runner_sdk.Client
-	timestampvmRPCEps []string
+	zcashRPCEps []string
 )
 
 var _ = ginkgo.BeforeSuite(func() {
@@ -208,7 +208,7 @@ var _ = ginkgo.BeforeSuite(func() {
 		break
 	}
 
-	timestampvmRPCEps = make([]string, 0)
+	zcashRPCEps = make([]string, 0)
 	blockchainID, logsDir := "", ""
 
 	// wait up to 5-minute for custom VM installation
@@ -233,7 +233,7 @@ done:
 		for _, v := range resp.ClusterInfo.CustomChains {
 			if v.VmId == vmID.String() {
 				blockchainID = v.ChainId
-				outf("{{blue}}timestampvm is ready:{{/}} %+v\n", v)
+				outf("{{blue}}zcash is ready:{{/}} %+v\n", v)
 				break done
 			}
 		}
@@ -252,8 +252,8 @@ done:
 
 	for _, u := range uris {
 		rpcEP := fmt.Sprintf("%s/ext/bc/%s/rpc", u, blockchainID)
-		timestampvmRPCEps = append(timestampvmRPCEps, rpcEP)
-		outf("{{blue}}avalanche timestampvm RPC:{{/}} %q\n", rpcEP)
+		zcashRPCEps = append(zcashRPCEps, rpcEP)
+		outf("{{blue}}avalanche zcash RPC:{{/}} %q\n", rpcEP)
 	}
 
 	pid := os.Getpid()
@@ -314,7 +314,7 @@ var _ = ginkgo.Describe("[ProposeBlock]", func() {
 			timestamp, data, height, id, _, err := cli.GetBlock(context.Background(), nil)
 			log.Warn("client shutdown result", "err", id)
 			gomega.Ω(timestamp).Should(gomega.Equal(uint64(0)))
-			gomega.Ω(data).Should(gomega.Equal(timestampvm.ZcashBlock{}))
+			gomega.Ω(data).Should(gomega.Equal(zcash.ZcashBlock{}))
 			gomega.Ω(height).Should(gomega.Equal(uint64(0)))
 			gomega.Ω(err).Should(gomega.BeNil())
 		}
@@ -326,7 +326,7 @@ var _ = ginkgo.Describe("[ProposeBlock]", func() {
 		return
 	}
 
-	//data := timestampvm.BytesToData(hashing.ComputeHash256([]byte("test")))
+	//data := zcash.BytesToData(hashing.ComputeHash256([]byte("test")))
 	//now := time.Now().Unix()
 	// ginkgo.It("create new block", func() {
 	// 	cli := instances[0].cli

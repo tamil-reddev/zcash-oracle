@@ -1,4 +1,4 @@
-module github.com/ava-labs/timestampvm
+module github.com/tamil-reddev/zcash-oracle
 
 go 1.19
 

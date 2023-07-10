@@ -16,8 +16,8 @@ export CGO_CFLAGS="-O -D__BLST_PORTABLE__"
 # Set the PATHS
 GOPATH="$(go env GOPATH)"
 
-# TimestampVM root directory
-TIMESTAMPVM_PATH=$(
+# zcash root directory
+ZCASH_PATH=$(
     cd "$(dirname "${BASH_SOURCE[0]}")"
     cd .. && pwd
 )
@@ -30,10 +30,10 @@ if [[ $# -eq 1 ]]; then
 elif [[ $# -eq 0 ]]; then
     binary_directory="$GOPATH/src/github.com/ava-labs/avalanchego/build/tGas3T58KzdjLHhBDMnH2TvrddhqTji5iZAMZ3RXs2NLpSnhH"
 else
-    echo "Invalid arguments to build timestampvm. Requires either no arguments (default) or one arguments to specify binary location."
+    echo "Invalid arguments to build zcash. Requires either no arguments (default) or one arguments to specify binary location."
     exit 1
 fi
 
-# Build timestampvm, which is run as a subprocess
-echo "Building timestampvm in $binary_directory"
+# Build zcash, which is run as a subprocess
+echo "Building zcash in $binary_directory"
 go build -o "$binary_directory" "main/"*.go

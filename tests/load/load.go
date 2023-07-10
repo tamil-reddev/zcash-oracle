@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ava-labs/timestampvm/tests/load/client"
-	"github.com/ava-labs/timestampvm/timestampvm"
+	"github.com/tamil-reddev/zcash-oracle/tests/load/client"
+	"github.com/tamil-reddev/zcash-oracle/zcash"
 	log "github.com/inconshreveable/log15"
 	"golang.org/x/sync/errgroup"
 )
@@ -21,7 +21,7 @@ const (
 	maxBackoff = 5 * time.Second
 )
 
-var _ Worker = (*timestampvmLoadWorker)(nil)
+var _ Worker = (*zcashLoadWorker)(nil)
 
 type Worker interface {
 	// Name returns the name of the worker
@@ -33,8 +33,8 @@ type Worker interface {
 	GetLastAcceptedHeight(ctx context.Context) (uint64, error)
 }
 
-// timestampvmLoadWorker implements the LoadWorker interface and adds continuous load through its client.
-type timestampvmLoadWorker struct {
+// zcashLoadWorker implements the LoadWorker interface and adds continuous load through its client.
+type zcashLoadWorker struct {
 	uri string
 	client.Client
 }
@@ -48,19 +48,19 @@ func newLoadWorkers(uris []string, blockchainID string) []Worker {
 	return workers
 }
 
-func newLoadWorker(uri string, blockchainID string) *timestampvmLoadWorker {
+func newLoadWorker(uri string, blockchainID string) *zcashLoadWorker {
 	uri = fmt.Sprintf("%s/ext/bc/%s", uri, blockchainID)
-	return &timestampvmLoadWorker{
+	return &zcashLoadWorker{
 		uri:    uri,
 		Client: client.New(uri),
 	}
 }
 
-func (t *timestampvmLoadWorker) Name() string {
-	return fmt.Sprintf("TimestampVM RPC Worker %s", t.uri)
+func (t *zcashLoadWorker) Name() string {
+	return fmt.Sprintf("ZCASH RPC Worker %s", t.uri)
 }
 
-func (t *timestampvmLoadWorker) AddLoad(ctx context.Context, quit <-chan struct{}) error {
+func (t *zcashLoadWorker) AddLoad(ctx context.Context, quit <-chan struct{}) error {
 	delay := time.Duration(0)
 	for {
 		select {
@@ -71,7 +71,7 @@ func (t *timestampvmLoadWorker) AddLoad(ctx context.Context, quit <-chan struct{
 		default:
 		}
 
-		data := [timestampvm.DataLen]byte{}
+		data := [zcash.DataLen]byte{}
 		_, err := rand.Read(data[:])
 		if err != nil {
 			return fmt.Errorf("failed to read random data: %w", err)
@@ -94,7 +94,7 @@ func (t *timestampvmLoadWorker) AddLoad(ctx context.Context, quit <-chan struct{
 }
 
 // GetLastAcceptedHeight returns the height of the last accepted block according to the worker
-func (t *timestampvmLoadWorker) GetLastAcceptedHeight(ctx context.Context) (uint64, error) {
+func (t *zcashLoadWorker) GetLastAcceptedHeight(ctx context.Context) (uint64, error) {
 	_, _, lastHeight, _, _, err := t.GetBlock(ctx, nil)
 	return lastHeight, err
 }

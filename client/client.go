@@ -8,13 +8,13 @@ import (
 
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/rpc"
-	"https://github.com/tamil-reddev/zcash-oracle/zcash"
+	"github.com/tamil-reddev/zcash-oracle/zcash"
 )
 
-// Client defines timestampvm client operations.
+// Client defines zcash client operations.
 type Client interface {
 	// GetBlock fetches the contents of a block
-	GetBlock(ctx context.Context, blockID *ids.ID) (uint64, timestampvm.ZcashBlock, uint64, ids.ID, ids.ID, error)
+	GetBlock(ctx context.Context, blockID *ids.ID) (uint64, zcash.ZcashBlock, uint64, ids.ID, ids.ID, error)
 
 	GetBlockByHeight(ctx context.Context, blockID uint64) (string, uint64, uint64, uint64, error)
 
@@ -31,11 +31,11 @@ type client struct {
 }
 
 
-func (cli *client) GetBlock(ctx context.Context, blockID *ids.ID) (uint64, timestampvm.ZcashBlock, uint64, ids.ID, ids.ID, error) {
-	resp := new(timestampvm.GetBlockReply)
+func (cli *client) GetBlock(ctx context.Context, blockID *ids.ID) (uint64, zcash.ZcashBlock, uint64, ids.ID, ids.ID, error) {
+	resp := new(zcash.GetBlockReply)
 	err := cli.req.SendRequest(ctx,
 		"zcash.getBlock",
-		&timestampvm.GetBlockArgs{ID: blockID},
+		&zcash.GetBlockArgs{ID: blockID},
 		resp,
 	)
 
@@ -46,10 +46,10 @@ func (cli *client) GetBlock(ctx context.Context, blockID *ids.ID) (uint64, times
 }
 
 func (cli *client) GetBlockByHeight(ctx context.Context, id uint64) (string, uint64, uint64,  uint64, error) {
-	resp := new(timestampvm.QueryZcashBlockReply)
+	resp := new(zcash.QueryZcashBlockReply)
 	err := cli.req.SendRequest(ctx,
 		"zcash.getBlockByHeight",
-		&timestampvm.QueryDataArgs{ID: id},
+		&zcash.QueryDataArgs{ID: id},
 		resp,
 	)
 	if err != nil {

@@ -16,21 +16,21 @@ if ! [[ "$0" =~ scripts/tests.load.sh ]]; then
   exit 255
 fi
 
-# TimestampVM root directory
-TIMESTAMPVM_PATH=$(
+# ZCASH root directory
+ZCASH_PATH=$(
   cd "$(dirname "${BASH_SOURCE[0]}")"
   cd .. && pwd
 )
 TERMINAL_HEIGHT=${TERMINAL_HEIGHT:-'1000000'}
 
 # Load the versions
-source "$TIMESTAMPVM_PATH"/scripts/versions.sh
+source "$ZCASH_PATH"/scripts/versions.sh
 
 # PWD is used in the avalanchego build script so we use a different var
 PPWD=$(pwd)
 ############################
 echo "building avalanchego"
-ROOT_PATH=/tmp/timestampvm-load
+ROOT_PATH=/tmp/zcash-load
 rm -rf ${ROOT_PATH}
 mkdir ${ROOT_PATH}
 cd ${ROOT_PATH}
@@ -46,7 +46,7 @@ git checkout ${avalanche_version}
 cd ${PPWD}
 
 ############################
-echo "building timestampvm"
+echo "building zcash"
 BUILD_PATH=${ROOT_PATH}/avalanchego/build
 PLUGINS_PATH=${BUILD_PATH}/plugins
 
