@@ -28,7 +28,7 @@ binary_directory="$GOPATH/src/github.com/ava-labs/avalanchego/build/plugins"
 if [[ $# -eq 1 ]]; then
     binary_directory=$1
 elif [[ $# -eq 0 ]]; then
-    binary_directory="$GOPATH/src/github.com/ava-labs/avalanchego/build/tGas3T58KzdjLHhBDMnH2TvrddhqTji5iZAMZ3RXs2NLpSnhH"
+    binary_directory="$GOPATH/src/github.com/ava-labs/avalanchego/build/vuF4cW6EQEknhDU36Q976iZoNWNkkbDEM87jasYF5JrCdUJan"
 else
     echo "Invalid arguments to build zcash. Requires either no arguments (default) or one arguments to specify binary location."
     exit 1

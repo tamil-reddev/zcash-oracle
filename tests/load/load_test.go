@@ -132,7 +132,7 @@ func init() {
 	)
 }
 
-const vmName = "timestamp"
+const vmName = "zcash"
 
 var vmID ids.ID
 

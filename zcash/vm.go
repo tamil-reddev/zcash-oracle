@@ -280,20 +280,6 @@ func (vm *VM) getBlock(blkID ids.ID) (*Block, error) {
 // LastAccepted returns the block most recently accepted
 func (vm *VM) LastAccepted(_ context.Context) (ids.ID, error) { return vm.state.GetLastAccepted() }
 
-// proposeBlock appends [data] to [p.mempool].
-// Then it notifies the consensus engine
-// that a new block is ready to be added to consensus
-// (namely, a block with data [data])
-/*func (vm *VM) proposeBlock(data [DataLen]byte) bool {
-	if len(vm.mempool) > MaxMempoolSize {
-		return false
-	}
-	vm.mempool = append(vm.mempool, data)
-	vm.NotifyBlockReady()
-	return true
-}*/
-
-
 func (vm *VM) addZcashBlock(block []byte) bool {
 	vm.mempool = append(vm.mempool, block)
 	vm.NotifyBlockReady()

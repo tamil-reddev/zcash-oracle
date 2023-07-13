@@ -13,35 +13,13 @@ import (
 )
 
 var (
-	errBadData               = errors.New("data must be hex representation of 32 bytes")
 	errNoSuchBlock           = errors.New("couldn't get block from database. Does it exist?")
 	errCannotGetLastAccepted = errors.New("problem getting last accepted")
-	errCannotDeleteLastAccepted = errors.New("Should not delete last accepted. Please provide id")
 	errNoSuchData  = errors.New("No data found!!")
 )
 
 // Service is the API service for this VM
 type Service struct{ vm *VM }
-
-// // ProposeBlockArgs are the arguments to function ProposeValue
-// type ProposeBlockArgs struct {
-// 	// Data in the block. Must be hex encoding of 32 bytes.
-// 	Data string `json:"data"`
-// }
-
-// // ProposeBlockReply is the reply from function ProposeBlock
-// type ProposeBlockReply struct{ Success bool }
-
-// ProposeBlock is an API method to propose a new block whose data is [args].Data.
-// [args].Data must be a string repr. of a 32 byte array
-/*func (s *Service) ProposeBlock(_ *http.Request, args *ProposeBlockArgs, reply *ProposeBlockReply) error {
-	bytes, err := formatting.Decode(formatting.Hex, args.Data)
-	if err != nil || len(bytes) != DataLen {
-		return errBadData
-	}
-	reply.Success = s.vm.proposeBlock(BytesToData(bytes))
-	return nil
-}*/
 
 // GetBlockArgs are the arguments to GetBlock
 type GetBlockArgs struct {
@@ -53,7 +31,7 @@ type GetBlockArgs struct {
 // GetBlockReply is the reply from GetBlock
 type GetBlockReply struct {
 	Timestamp json.Uint64 `json:"timestamp"` // Timestamp of block
-	Data      ZcashBlock      `json:"data"`      // Data (hex-encoded) in block
+	Data      ZcashBlock  `json:"data"`  // Data of zcash block
 	Height    json.Uint64 `json:"height"`    // Height of block
 	ID        ids.ID      `json:"id"`        // String repr. of ID of block
 	ParentID  ids.ID      `json:"parentID"`  // String repr. of ID of block's parent
@@ -138,7 +116,7 @@ func (s *Service) GetBlockByHeight(_ *http.Request, args *QueryDataArgs, reply *
 	)
 
 	if args.ID == 0 {
-		return errCannotDeleteLastAccepted
+		return errNoSuchBlock
 	} else {
 		id = args.ID
 	}

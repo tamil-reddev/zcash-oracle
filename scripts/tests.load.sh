@@ -52,7 +52,7 @@ PLUGINS_PATH=${BUILD_PATH}/plugins
 
 # previous binary already deleted in last build phase
 go build \
-  -o ${PLUGINS_PATH}/tGas3T58KzdjLHhBDMnH2TvrddhqTji5iZAMZ3RXs2NLpSnhH \
+  -o ${PLUGINS_PATH}/vuF4cW6EQEknhDU36Q976iZoNWNkkbDEM87jasYF5JrCdUJan \
   ./main/
 
 ############################
@@ -126,4 +126,4 @@ echo "running load tests"
 echo "network-runner RPC server was running on PID ${PID} as test mode; terminating the process..."
 pkill -P ${PID} || true
 kill -2 ${PID} || true
-pkill -9 -f tGas3T58KzdjLHhBDMnH2TvrddhqTji5iZAMZ3RXs2NLpSnhH || true # in case pkill didn't work
+pkill -9 -f vuF4cW6EQEknhDU36Q976iZoNWNkkbDEM87jasYF5JrCdUJan || true # in case pkill didn't work
