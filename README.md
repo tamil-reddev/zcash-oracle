@@ -1,18 +1,14 @@
 # Zcash Virtual Machine
 
-[![Lint+Test+Build](https://github.com/red-dev-inc/zcash-oracle/actions/workflows/lint_test_build.yml/badge.svg)](https://github.com/red-dev-inc/zcash-oracle/actions/workflows/lint_test_build.yml)
-
 Avalanche is a network composed of multiple blockchains. Each blockchain is an instance of a [Virtual Machine (VM)](https://docs.avax.network/learn/platform-overview#virtual-machines), much like an object in an object-oriented language is an instance of a class. That is, the VM defines the behavior of the blockchain.
 
 ZavaX defines a blockchain that is a zcash-avax server. Each block in the blockchain contains the zcash block. This VM demonstrates capabilities of custom VMs and custom blockchains. For more information, see: [Create a Virtual Machine](https://docs.avax.network/build/tutorials/platform/create-a-virtual-machine-vm)
 
 ## Running the VM
 [`scripts/run.sh`](scripts/run.sh) automatically installs [avalanchego], sets up a local network,
-and creates a `zcash` genesis file. To build and run E2E tests, you need to set the variable `E2E` before it: `E2E=true ./scripts/run.sh 1.7.11`
+and creates a `zcash` genesis file.
 
 *Note: The above script relies on ginkgo to run successfully. Ensure that $GOPATH/bin is part of your $PATH before running the script.*  
-
-_See [`tests/e2e`](tests/e2e) to see how it's set up and how its client requests are made._
 
 ```bash
 # to startup a local cluster (good for development)
